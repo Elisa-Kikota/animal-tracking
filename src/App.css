@@ -1,0 +1,21 @@
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+.app-container {
+  display: flex;
+  transition: margin-left 0.3s;
+  min-height: 100%;
+}
+
+.sidebar-open .content-container {
+  margin-left: 250px; /* Width of the sidebar */
+}
+
+.content-container {
+  flex: 1;
+  transition: margin-left 0.3s;
+  margin-top: 64px; /* Adjust based on your navbar height */
+  padding: 20px;
+}

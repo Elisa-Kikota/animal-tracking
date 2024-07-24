@@ -1,0 +1,38 @@
+/* Sidebar styling to match navbar */
+.sidebar {
+    width: 250px;
+    position: fixed;
+    top: 64px; /* Adjust based on your navbar height */
+    left: 0;
+    height: calc(100% - 64px); /* Adjust based on your navbar height */
+    background-color: #1F76CE;
+    color: white;
+    transition: transform 0.3s ease;
+    transform: translateX(-100%);
+    z-index: 1000;
+    padding-top: 20px;
+  }
+  
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .sidebar ul li {
+    padding: 15px 20px;
+  }
+  
+  .sidebar ul li a {
+    color: white;
+    text-decoration: none;
+    display: block;
+  }
+  
+  .sidebar ul li a:hover {
+    background-color: #56a1ed;
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  
