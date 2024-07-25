@@ -16,7 +16,7 @@ const Welcome = () => {
       textAlign: 'center', 
       padding: '20px'
     }}>
-      <Container maxWidth="lg">
+      <Container maxWidth='lg'>
         <Box my={4}>
           <Typography variant="h2" component="h1" gutterBottom style={{ color: 'white' }}>
             Welcome to Animal Tracking
@@ -27,9 +27,9 @@ const Welcome = () => {
           <Button variant="contained" color="primary" component={Link} to="/real_time" style={{ margin: '20px' }}>
             Start Tracking
           </Button>
-          <Button variant="outlined" color="secondary" component={Link} to="/learn_more">
+          {/* <Button variant="outlined" color="secondary" component={Link} to="/learn_more">
             Learn More
-          </Button>
+          </Button> */}
         </Box>
 
         <Box my={4}>

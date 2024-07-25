@@ -1,38 +1,64 @@
 /* Sidebar styling to match navbar */
 .sidebar {
-    width: 250px;
-    position: fixed;
-    top: 64px; /* Adjust based on your navbar height */
-    left: 0;
-    height: calc(100% - 64px); /* Adjust based on your navbar height */
-    background-color: #1F76CE;
-    color: white;
-    transition: transform 0.3s ease;
-    transform: translateX(-100%);
-    z-index: 1000;
-    padding-top: 20px;
-  }
-  
-  .sidebar ul {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .sidebar ul li {
-    padding: 15px 20px;
-  }
-  
-  .sidebar ul li a {
-    color: white;
-    text-decoration: none;
-    display: block;
-  }
-  
-  .sidebar ul li a:hover {
-    background-color: #56a1ed;
-  }
-  
-  .sidebar.open {
-    transform: translateX(0);
-  }
-  
+  width: 250px;
+  position: fixed;
+  top: 64px; /* Adjust based on your navbar height */
+  left: 0;
+  height: calc(100% - 64px); /* Adjust based on your navbar height */
+  background-color: rgb(31, 118, 206);
+  color: white;
+  transition: transform 0.3s ease;
+  transform: translateX(-100%);
+  z-index: 1000;
+  padding-top: 0px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  padding: 3px 0px;
+  position: relative;
+  overflow: hidden; /* Needed for the wave effect */
+}
+
+.sidebar ul li a {
+  color: white;
+  text-decoration: none;
+  display: block;
+  padding-left: 15px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  position: relative;
+}
+
+.sidebar ul li a::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300%;
+  height: 300%;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  transition: transform 0.1s, opacity 0.5s;
+  pointer-events: none;
+}
+
+.sidebar ul li a:active::before {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+  transition: transform 0.5s, opacity 0.5s;
+}
+
+.sidebar ul li a:hover {
+  background-color: #08468419;
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
