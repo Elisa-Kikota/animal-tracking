@@ -1,39 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import io from 'socket.io-client';
-import { Container, Typography, Box } from '@mui/material';
+import mapboxgl from 'mapbox-gl';
+import '../styles/RealTime.css';
 
-const socket = io('http://localhost:5000'); // Adjust the server URL accordingly
+mapboxgl.accessToken = 'pk.eyJ1IjoiZWxpc2FraWtvdGEiLCJhIjoiY2x6MTkwYWRiMnE0ZTJpcjR5bzFjMzNrZyJ9.HRBoAER-bGLPEcdhbUsW_A';
 
 const RealTimeTracking = () => {
-  const [trackingData, setTrackingData] = useState(null);
+    const [animalData, setAnimalData] = useState([]);
 
-  useEffect(() => {
-    socket.on('trackingData', (data) => {
-      setTrackingData(data);
-    });
+    useEffect(() => {
+        // Fetch the animal data from your API
+        fetch('/api/animals')
+            .then(response => response.json())
+            .then(data => setAnimalData(data));
 
-    return () => {
-      socket.off('trackingData');
-    };
-  }, []);
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11',
+            center: [34.85770, -6.009865], // Initial map center -6.009865, 34.857700
+            zoom: 6
+        });
 
-  return (
-    <Container>
-      <Box my={4}>
-        <Typography variant="h4">Real-Time Animal Tracking</Typography>
-        {trackingData ? (
-          <Box my={2}>
-            <Typography variant="h6">Animal ID: {trackingData.id}</Typography>
-            <Typography>Latitude: {trackingData.location.lat}</Typography>
-            <Typography>Longitude: {trackingData.location.lng}</Typography>
-            <Typography>Timestamp: {trackingData.timestamp}</Typography>
-          </Box>
-        ) : (
-          <Typography>Loading tracking data...</Typography>
-        )}
-      </Box>
-    </Container>
-  );
+        animalData.forEach(animal => {
+            new mapboxgl.Marker()
+                .setLngLat([animal.longitude, animal.latitude])
+                .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(`${animal.name} (${animal.species})`))
+                .addTo(map);
+        });
+
+        return () => map.remove();
+    }, [animalData]);
+
+    return <div id="map" style={{ width: '100%', height: '100vh' }}></div>;
 };
 
 export default RealTimeTracking;
