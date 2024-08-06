@@ -1,27 +1,52 @@
-/* styles/RealTime.css */
-
 .realtime-container {
-    display: flex;
-    position: relative;
-    padding-right: -20px;
-  }
-  
-  .animal-list {
-    position: absolute;
-    right: 0;
-    top: 0;
-    background-color: white;
-    padding: 10px;
-    max-height: 100vh;
-    overflow-y: auto;
-    z-index: 1;
-  }
-  
-  .marker {
-    background-size: cover;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    border: 2px solid white;
-  }
-  
+  display: flex;
+  position: relative;
+}
+
+#map {
+  flex: 1;
+}
+
+.fixed-sidebar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 70px;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.sidebar-button {
+  background: none;
+  border: none;
+  color: white;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width:200px;
+}
+
+.sidebar-button .sidebar-icon {
+  display: block;
+  width: 35px;
+  height: 35px;
+  margin-bottom: 5px;
+}
+
+.animal-list {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 10px;
+  border-radius: 5px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
