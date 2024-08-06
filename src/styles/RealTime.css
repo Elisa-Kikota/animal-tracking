@@ -1,4 +1,27 @@
-#map {
-    width: 100%;
-    height: 100vh;
-}
+/* styles/RealTime.css */
+
+.realtime-container {
+    display: flex;
+    position: relative;
+    padding-right: -20px;
+  }
+  
+  .animal-list {
+    position: absolute;
+    right: 0;
+    top: 0;
+    background-color: white;
+    padding: 10px;
+    max-height: 100vh;
+    overflow-y: auto;
+    z-index: 1;
+  }
+  
+  .marker {
+    background-size: cover;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid white;
+  }
+  
