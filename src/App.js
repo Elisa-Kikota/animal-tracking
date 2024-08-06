@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
@@ -24,7 +24,6 @@ const pageOrder = [
 
 const AppContent = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const prevLocationRef = useRef(location);
   const [direction, setDirection] = useState('up');
 
