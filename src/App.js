@@ -41,12 +41,6 @@ const AppContent = () => {
     prevLocationRef.current = location;
   }, [location]);
 
-  const handlePageChange = (path) => {
-    if (location.pathname !== path) {
-      navigate(path);
-    }
-  };
-
   return (
     <TransitionGroup>
       <CSSTransition
