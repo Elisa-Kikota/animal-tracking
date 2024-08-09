@@ -1,6 +1,6 @@
 /* Sidebar styling to match navbar */
 .sidebar {
-  width: 250px;
+  width: 160px;
   position: fixed;
   top: 64px; /* Adjust based on your navbar height */
   left: 0;

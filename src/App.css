@@ -10,7 +10,7 @@ html, body, #root {
 }
 
 .sidebar-open .content-container {
-  margin-left: 250px; /* Width of the sidebar */
+  margin-left: 160px; /* Width of the sidebar */
 }
 
 .content-container {
