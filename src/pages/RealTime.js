@@ -1,3 +1,7 @@
+import { ref, onValue } from 'firebase/database';
+import { database } from '../firebase'; // Adjust the path if needed
+
+
 import reportsIcon from '../assets/reports.png';
 import patrolsIcon from '../assets/patrols.png';
 import layersIcon from '../assets/layers.png';
@@ -5,9 +9,12 @@ import outdoorsIcon from '../assets/outdoors.png';
 import lightIcon from '../assets/light.png';
 import darkIcon from '../assets/dark.png';
 import satelliteIcon from '../assets/satellite.png';
+import animalIcon from '../assets/animal.png';
 import threeDIcon from '../assets/3d.png';
 import heatmapIcon from '../assets/heatmap.png';
 import locationIcon from '../assets/location.png'
+import elephantIcon from '../assets/elephant.png'
+
 
 import React, { useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
@@ -20,6 +27,9 @@ const RealTime = () => {
   const [map, setMap] = useState(null);
   const [isLayerMenuVisible, setIsLayerMenuVisible] = useState(false);
   const [isReportMenuVisible, setIsReportMenuVisible] = useState(false);
+  const [isPatrolMenuVisible, setIsPatrolMenuVisible] = useState(false);
+  const [isAnimalMenuVisible, setIsAnimalMenuVisible] = useState(false);
+
 
   useEffect(() => {
     const mapInstance = new mapboxgl.Map({
@@ -29,35 +39,71 @@ const RealTime = () => {
       zoom: 17.3,
       attributionControl: false,
     });
-
+  
     mapInstance.on('load', () => {
-      fetch('http://localhost:5000/animals')
-        .then((response) => response.json())
-        .then((data) => {
-          setAnimalData(data);
-          data.forEach((animal) => {
+      const animalsRef = ref(database, 'Animals/Elephants');
+      onValue(animalsRef, (snapshot) => {
+        const data = snapshot.val();
+        const animalArray = Object.keys(data).map((key) => {
+          const animal = data[key];
+          const latestTimestamp = Object.keys(animal.location).sort().pop();
+          const latestTime = Object.keys(animal.location[latestTimestamp]).sort().pop();
+          const location = animal.location[latestTimestamp][latestTime];
+
+          // Format the date and time
+          const date = latestTimestamp; // Assumes latestTimestamp is in 'YYYY-MM-DD' format
+          const time = latestTime; // Assumes latestTime is in 'HH:MM' format
+
+          return {
+            ...animal,
+            id: key,
+            location: {
+              Lat: parseFloat(location.Lat),
+              Lng: parseFloat(location.Long),
+            },
+          };
+        });
+  
+        setAnimalData(animalArray);
+        animalArray.forEach((animal) => {
+          if (!isNaN(animal.location.Lat) && !isNaN(animal.location.Lng)) {
             new mapboxgl.Marker({ element: createMarkerElement(animal.icon) })
-              .setLngLat([animal.location.lng, animal.location.lat])
-              .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(`${animal.name} (${animal.species})`))
+              .setLngLat([animal.location.Lng, animal.location.Lat]) // Mapbox uses [Lng, Lat]
+              .setPopup(new mapboxgl.Popup({ offset: 25 })
+              .setHTML(
+                <div>
+                  <strong>${animal.species}</strong><br />
+                  Sex: ${animal.sex}<br />
+                  Age: ${animal.age} years<br />
+                  Date: ${animal.date}<br /> 
+                  Time: ${animal.time} 
+                </div>
+              ))
               .addTo(mapInstance);
-          });
-        })
-        .catch((error) => console.error('Error fetching animal data:', error));
+          } else {
+            console.error('Invalid coordinates for animal:', animal);
+          }
+        });
+      }, (error) => {
+        console.error('Error fetching animal data:', error);
+      });
     });
-
+  
     setMap(mapInstance);
-
+  
     return () => mapInstance.remove();
   }, []);
+  
 
-  const createMarkerElement = (icon) => {
-    const el = document.createElement('div');
-    el.className = 'marker';
-    el.style.backgroundImage = `url(${icon})`;
-    el.style.width = '30px';
-    el.style.height = '30px';
-    el.style.backgroundSize = '100%';
-    return el;
+
+  const createMarkerElement = () => {
+    const markerDiv = document.createElement('div');
+    markerDiv.className = 'marker';
+    markerDiv.style.backgroundImage = `url(${elephantIcon})`;
+    markerDiv.style.backgroundSize = 'cover';
+    markerDiv.style.width = '32px';
+    markerDiv.style.height = '32px';
+    return markerDiv;
   };
 
   const handleLayerChange = (style) => {
@@ -66,25 +112,33 @@ const RealTime = () => {
     }
   };
 
-  const [isPatrolMenuVisible, setIsPatrolMenuVisible] = useState(false);
 
-
-  const toggleLayerMenu = () => {
-    setIsLayerMenuVisible(!isLayerMenuVisible);
-    setIsReportMenuVisible(false); // Close report menu if open
-    setIsPatrolMenuVisible(false);
-  };
-  
   const toggleReportMenu = () => {
     setIsReportMenuVisible(!isReportMenuVisible);
-    setIsLayerMenuVisible(false); // Close layer menu if open
+    setIsLayerMenuVisible(false);
     setIsPatrolMenuVisible(false);
+    setIsAnimalMenuVisible(false);
   };
 
   const togglePatrolMenu = () => {
+    setIsReportMenuVisible(false);
     setIsPatrolMenuVisible(!isPatrolMenuVisible);
     setIsLayerMenuVisible(false);
+    setIsAnimalMenuVisible(false);
+  };
+
+  const toggleLayerMenu = () => {
     setIsReportMenuVisible(false);
+    setIsPatrolMenuVisible(false);
+    setIsLayerMenuVisible(!isLayerMenuVisible);
+    setIsAnimalMenuVisible(false);
+  };
+
+  const toggleAnimalMenu = () => {
+    setIsReportMenuVisible(false); 
+    setIsPatrolMenuVisible(false);
+    setIsLayerMenuVisible(false);
+    setIsAnimalMenuVisible(!isAnimalMenuVisible);
   };
   
   
@@ -101,11 +155,15 @@ const RealTime = () => {
           <img src={patrolsIcon} alt="Patrols" className="sidebar-icon" />
           <span>Patrols</span>
         </button>
-
         <button className="sidebar-button" onClick={toggleLayerMenu}>
           <img src={layersIcon} alt="Layers" className="sidebar-icon" />
           <span>Layers</span>
         </button>
+        <button className="sidebar-button" onClick={toggleAnimalMenu}>
+          <img src={animalIcon} alt="Animals" className="sidebar-icon" />
+          <span>Animals</span>
+        </button>
+
         <div id="layer-menu" className={`layer-menu ${isLayerMenuVisible ? 'show' : 'hide'}`}>
           <button className="btn" onClick={() => handleLayerChange('mapbox/outdoors-v11')}>
             <img src={outdoorsIcon} alt="Outdoors" className="layer-icon" />
@@ -137,7 +195,7 @@ const RealTime = () => {
       <div id="report-menu" className={`report-menu ${isReportMenuVisible ? 'show' : 'hide'}`}>
         <div className="report-header">
           <span className="plus-sign">+</span>
-          <span className="report-title">Report</span>
+          <span className="report-title">Reports</span>
           <span className="close-sign" onClick={toggleReportMenu}>x</span>
         </div>
         <div className="report-filters">
@@ -153,8 +211,8 @@ const RealTime = () => {
           {/* Replace with dynamic data */}
           <div className="report-item">
             <img src={reportsIcon} alt="Report" className="report-image" />
-            <span className="entry-number">#123</span>
-            <span className="report-name">Animal Report Name</span>
+            <span className="entry-number">2</span>
+            <span className="report-name">Antelope Injury</span>
             <span className="report-day-time">
               <div classname="report-date">9th Aug 2024</div>
               <div classname="report-time">12:30 PM</div>
@@ -168,8 +226,8 @@ const RealTime = () => {
       <div id="patrol-menu" className={`patrol-menu ${isPatrolMenuVisible ? 'show' : 'hide'}`}>
         <div className="patrol-header">
           <span className="plus-sign">+</span>
-          <span className="report-title">Patrols</span>
-          <span className="close-sign" onClick={toggleReportMenu}>x</span>
+          <span className="report-title">Patrol Officers</span>
+          <span className="close-sign" onClick={togglePatrolMenu}>x</span>
         </div>
         <div className="patrol-filters">
           <input type="text" placeholder="Search..." className="search-bar" />
@@ -184,8 +242,8 @@ const RealTime = () => {
           {/* Replace with dynamic data */}
           <div className="patrol-item">
             <img src={patrolsIcon} alt="patrol" className="patrol-image" />
-            <span className="entry-number">#123</span>
-            <span className="report-name">Animal Report Name</span>
+            <span className="entry-number">1</span>
+            <span className="report-name">Elisa Kikota</span>
             <span className="report-day-time">
               <div classname="patrol-date">9th Aug 2024</div>
               <div classname="patrol-time">12:30 PM</div>
@@ -195,6 +253,42 @@ const RealTime = () => {
           {/* Repeat for other reports */}
         </div>
       </div>
+
+      
+  <div id="animal-menu" className={`animal-menu ${isAnimalMenuVisible ? 'show' : 'hide'}`}>
+    <div className="animal-header">
+      <span className="plus-sign">+</span>
+      <span className="animal-title">Animals</span>
+      <span className="close-sign" onClick={() => setIsAnimalMenuVisible(false)}>x</span>
+    </div>
+    <div className="animal-filters">
+      <input type="text" placeholder="Search..." className="search-bar" />
+      <button className="filter-btn">Filters</button>
+      <button className="date-btn">Dates</button>
+      <button className="date-updated-btn">Date Updated</button>
+    </div>
+    <div className="animal-summary">
+      <span>{animalData.length} results from about <b>{/* time logic here */} ago until now</b></span>
+    </div>
+    <div className="animal-list">
+      {animalData.map((animal) => (
+        <div key={animal.id} className="animal-item">
+          <img src={elephantIcon} alt="animal" className="patrol-image" />
+          <span className="entry-number">{animal.id}</span>
+          <span className="animal-name">{animal.species}</span>
+          <span className="animal-day-time">
+            <div className="animal-date">9th Aug 2024</div>
+            <div className="animal-time">12:30 PM</div>
+          </span>
+          <button className="locate-icon">
+            <img src={locationIcon} alt="locationIcon" className="layer-icon" />
+          </button>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
 
     </div>
   );
