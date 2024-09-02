@@ -29,7 +29,7 @@ import MarkerClusterGroup from 'react-leaflet-cluster';
 
 export default function RealTime() {
   const [animalData, setAnimalData] = useState([]);
-  const [map, setMap] = useState(null);
+  const [map] = useState(null);
   const [isLayerMenuVisible, setIsLayerMenuVisible] = useState(false);
   const [isReportMenuVisible, setIsReportMenuVisible] = useState(false);
   const [isPatrolMenuVisible, setIsPatrolMenuVisible] = useState(false);
@@ -91,23 +91,6 @@ export default function RealTime() {
     });
   }, []);
   
-  
-
-  
-
-  const customIcon = new Icon({
-    //iconUrl: "https://cdn-icons-png.flaticon.com/512/5591/5591266.png",
-    iconUrl: require("../assets/location.png"),
-    iconSize: [38, 38] // size of icon
-  })
-
-  const createCustomClusterIcon = (cluster) => {
-    return new divIcon({
-      html:`<div class="cluster-icon">${cluster.getChildCount()}</div>`,
-      className: "custom-marker-cluster",
-      //iconSize: [33,33]
-    });
-  };
 
   const handleLayerChange = (style) => {
     if (map) {
