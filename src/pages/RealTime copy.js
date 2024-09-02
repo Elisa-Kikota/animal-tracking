@@ -1,8 +1,6 @@
-import '../styles/RealTime.css';
-import "leaflet/dist/leaflet.css"
-
 import { ref, onValue } from 'firebase/database';
 import { database } from '../firebase'; // Adjust the path if needed
+
 
 import reportsIcon from '../assets/reports.png';
 import patrolsIcon from '../assets/patrols.png';
@@ -16,18 +14,23 @@ import threeDIcon from '../assets/3d.png';
 import heatmapIcon from '../assets/heatmap.png';
 import locationIcon from '../assets/location.png'
 
+
 import elephantIcon from '../assets/elephant.png'
 import lionIcon from '../assets/lion.png';
 import giraffeIcon from '../assets/giraffe.png';
 import rhinoIcon from '../assets/rhino.png';
 import leopardIcon from '../assets/leopard.png';
 
-import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import {Icon, divIcon} from "leaflet";
-import MarkerClusterGroup from 'react-leaflet-cluster';
 
-export default function RealTime() {
+import React, { useEffect, useState } from 'react';
+import mapboxgl from 'mapbox-gl';
+import '../styles/RealTime.css';
+
+
+mapboxgl.accessToken = 'pk.eyJ1IjoiZWxpc2FraWtvdGEiLCJhIjoiY2x6MTkwYWRiMnE0ZTJpcjR5bzFjMzNrZyJ9.HRBoAER-bGLPEcdhbUsW_A';
+// mapboxgl.accessToken = 'pk.eyJ1IjoiZWxpc2FraWtvdGEiLCJhIjoiY20wMmRsY2gzMDAyczJ2cjFpZ2FudnR0ayJ9.LI2OnTDNopBb5YcHHJ2Xqg';
+
+const RealTime = () => {
   const [animalData, setAnimalData] = useState([]);
   const [map, setMap] = useState(null);
   const [isLayerMenuVisible, setIsLayerMenuVisible] = useState(false);
@@ -35,79 +38,115 @@ export default function RealTime() {
   const [isPatrolMenuVisible, setIsPatrolMenuVisible] = useState(false);
   const [isAnimalMenuVisible, setIsAnimalMenuVisible] = useState(false);
 
-  // markers
-  // const markers = [
-  //   {
-  //     geocode: [-1.47311, 34.166586],
-  //     popUp:"Hello, I am pop up 1"
-  //   },
-  //   {
-  //     geocode: [-1.48311, 34.156586],
-  //     popUp:"Hello, I am pop up 2"
-  //   },
-  //   {
-  //     geocode: [-1.48311, 34.176586],
-  //     popUp:"Hello, I am pop up 3"
-  //   }
-  // ];
 
   useEffect(() => {
-    const animalSpecies = ['Elephants', 'Giraffes', 'Lions', 'Leopards', 'Rhinos'];
-    const fetchedData = [];
+    const mapInstance = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/streets-v11',
+      center: [34.166586,-1.948311],
+      zoom: 17.3,
+      attributionControl: false,
+    });
   
-    animalSpecies.forEach((species) => {
-      const animalsRef = ref(database, `Animals/${species}`);
-      onValue(animalsRef, (snapshot) => {
-        const data = snapshot.val();
-        const animalArray = Object.keys(data).map((key) => {
-          const animal = data[key];
-          const latestTimestamp = Object.keys(animal.location).sort().pop();
-          const latestTime = Object.keys(animal.location[latestTimestamp]).sort().pop();
-          const location = animal.location[latestTimestamp][latestTime];
+    mapInstance.on('load', () => {
+      const animalSpecies = ['Elephants', 'Giraffes', 'Lions', 'Leopards', 'Rhinos'];
+      
+      animalSpecies.forEach((species) => {
+        const animalsRef = ref(database, `Animals/${species}`);
+        onValue(animalsRef, (snapshot) => {
+          const data = snapshot.val();
+          const animalArray = Object.keys(data).map((key) => {
+            const animal = data[key];
+            const latestTimestamp = Object.keys(animal.location).sort().pop();
+            const latestTime = Object.keys(animal.location[latestTimestamp]).sort().pop();
+            const location = animal.location[latestTimestamp][latestTime];
   
-          // Extract temp and activity from the location data
-          const temp = location.temperature || 'N/A'; // Default to 'N/A' if temp is not available
-          const activity = location.activity || 'N/A'; // Default to 'N/A' if activity is not available
+            return {
+              ...animal,
+              id: key,
+              species: species.slice(0, -1), // Convert 'Elephants' to 'Elephant'
+              location: {
+                Lat: parseFloat(location.Lat),
+                Lng: parseFloat(location.Long),
+              },
+              date: latestTimestamp, // This is the latest date
+              time: latestTime,      // This is the latest time
+            };
+          });
   
-          return {
-            ...animal,
-            id: key,
-            species: species.slice(0, -1),
-            location: {
-              Lat: parseFloat(location.Lat),
-              Lng: parseFloat(location.Long),
-            },
-            date: latestTimestamp,
-            time: latestTime,
-            temp: temp, 
-            activity: activity, 
-          };
+          setAnimalData((prevData) => [...prevData, ...animalArray]);
+  
+          animalArray.forEach((animal) => {
+            if (!isNaN(animal.location.Lat) && !isNaN(animal.location.Lng)) {
+              new mapboxgl.Marker({ element: createMarkerElement(animal.species) })
+                .setLngLat([animal.location.Lng, animal.location.Lat])
+                .setPopup(new mapboxgl.Popup({ offset: 25 })
+                .setHTML(
+                  `<div 
+                      style="
+                        background-color: #f0f0f0; 
+                        padding: 10px;
+                        border-radius:20;"
+                      width:30;>
+                    <strong>${animal.species}</strong><br />
+                    Sex: ${animal.sex}<br />
+                    Age: ${animal.age} years<br />
+                    Date: ${animal.date}<br /> 
+                    Time: ${animal.time} 
+                  </div>`
+                ))
+                .addTo(mapInstance);
+            } else {
+              console.error('Invalid coordinates for animal:', animal);
+            }
+          });
+          
+        }, (error) => {
+          console.error('Error fetching animal data:', error);
         });
-        fetchedData.push(...animalArray);
-        setAnimalData(fetchedData);
-      }, (error) => {
-        console.error('Error fetching animal data:', error);
       });
     });
+  
+    setMap(mapInstance);
+  
+    return () => mapInstance.remove();
   }, []);
   
+
+
+  const createMarkerElement = (species) => {
+    const markerDiv = document.createElement('div');
+    markerDiv.className = 'marker';
+    let iconUrl;
   
-
+    switch (species) {
+      case 'Elephant':
+        iconUrl = elephantIcon;
+        break;
+      case 'Lion':
+        iconUrl = lionIcon;
+        break;
+      case 'Giraffe':
+        iconUrl = giraffeIcon;
+        break;
+      case 'Rhino':
+        iconUrl = rhinoIcon;
+        break;
+      case 'Leopard':
+        iconUrl = leopardIcon;
+        break;
+      default:
+        iconUrl = animalIcon; // Fallback icon
+        break;
+    }
   
-
-  const customIcon = new Icon({
-    //iconUrl: "https://cdn-icons-png.flaticon.com/512/5591/5591266.png",
-    iconUrl: require("../assets/location.png"),
-    iconSize: [38, 38] // size of icon
-  })
-
-  const createCustomClusterIcon = (cluster) => {
-    return new divIcon({
-      html:`<div class="cluster-icon">${cluster.getChildCount()}</div>`,
-      className: "custom-marker-cluster",
-      //iconSize: [33,33]
-    });
+    markerDiv.style.backgroundImage = `url(${iconUrl})`;
+    markerDiv.style.backgroundSize = 'cover';
+    markerDiv.style.width = '32px';
+    markerDiv.style.height = '32px';
+    return markerDiv;
   };
+  
 
   const handleLayerChange = (style) => {
     if (map) {
@@ -143,77 +182,31 @@ export default function RealTime() {
     setIsLayerMenuVisible(false);
     setIsAnimalMenuVisible(!isAnimalMenuVisible);
   };
+  
+  
 
   return (
     <div className="realtime-container">
+      <div id="map" style={{ width: '100%', height: '100%' }}></div>
       <div className="fixed-sidebar">
-        <button className="sidebar-button" onClick={toggleReportMenu}>
-            <img src={reportsIcon} alt="Reports" className="sidebar-icon" />
-            <span>Reports</span>
-          </button>
-          <button className="sidebar-button" onClick={togglePatrolMenu}>
-            <img src={patrolsIcon} alt="Patrols" className="sidebar-icon" />
-            <span>Patrols</span>
-          </button>
-          <button className="sidebar-button" onClick={toggleLayerMenu}>
-            <img src={layersIcon} alt="Layers" className="sidebar-icon" />
-            <span>Layers</span>
-          </button>
-          <button className="sidebar-button" onClick={toggleAnimalMenu}>
-            <img src={animalIcon} alt="Animals" className="sidebar-icon" />
-            <span>Animals</span>
-          </button>
-        </div>
-    
+      <button className="sidebar-button" onClick={toggleReportMenu}>
+          <img src={reportsIcon} alt="Reports" className="sidebar-icon" />
+          <span>Reports</span>
+        </button>
+        <button className="sidebar-button" onClick={togglePatrolMenu}>
+          <img src={patrolsIcon} alt="Patrols" className="sidebar-icon" />
+          <span>Patrols</span>
+        </button>
+        <button className="sidebar-button" onClick={toggleLayerMenu}>
+          <img src={layersIcon} alt="Layers" className="sidebar-icon" />
+          <span>Layers</span>
+        </button>
+        <button className="sidebar-button" onClick={toggleAnimalMenu}>
+          <img src={animalIcon} alt="Animals" className="sidebar-icon" />
+          <span>Animals</span>
+        </button>
 
-        <MapContainer className="map" center={[-1.948, 34.1665]} zoom={16}>
-  <TileLayer
-    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-  />
-  <MarkerClusterGroup
-    chunkedLoading
-    // iconCreateFunction={createCustomClusterIcon}
-  >
-    {animalData.map(animal => {
-      // Determine the icon based on species
-      const speciesIcon = new Icon({
-        iconUrl: 
-          animal.species.toLowerCase() === 'elephant' ? elephantIcon :
-          animal.species.toLowerCase() === 'lion' ? lionIcon :
-          animal.species.toLowerCase() === 'giraffe' ? giraffeIcon :
-          animal.species.toLowerCase() === 'rhino' ? rhinoIcon :
-          animal.species.toLowerCase() === 'leopard' ? leopardIcon :
-          animalIcon, // Default icon for other species
-        iconSize: [38, 38] // Adjust size as needed
-      });
-
-      return (
-        <Marker 
-          key={animal.id} // Ensure each marker has a unique key
-          position={[animal.location.Lat, animal.location.Lng]} 
-          icon={speciesIcon} // Use species-specific icon
-        >
-          <Popup>
-            <div style={{ padding: '0px', borderRadius: '1px' }}>
-              <strong>{animal.name}</strong><br />
-              Sex: {animal.sex}<br />
-              Age: {animal.age} years<br />
-              Temp: {animal.temp} °C<br /> 
-              Activity: {animal.activity}
-            </div>
-          </Popup>
-
-        </Marker>
-      );
-    })}
-  </MarkerClusterGroup>
-</MapContainer>
-
-
-
-      
-
-      <div id="layer-menu" className={`layer-menu ${isLayerMenuVisible ? 'show' : 'hide'}`}>
+        <div id="layer-menu" className={`layer-menu ${isLayerMenuVisible ? 'show' : 'hide'}`}>
           <button className="btn" onClick={() => handleLayerChange('mapbox/outdoors-v11')}>
             <img src={outdoorsIcon} alt="Outdoors" className="layer-icon" />
             Outdoors
@@ -238,8 +231,9 @@ export default function RealTime() {
             <img src={heatmapIcon} alt="HeatMap" className="layer-icon" />
             HeatMap
           </button>
+        </div>
       </div>
-
+      
       <div id="report-menu" className={`report-menu ${isReportMenuVisible ? 'show' : 'hide'}`}>
         <div className="report-header">
           <span className="plus-sign">+</span>
@@ -341,8 +335,11 @@ export default function RealTime() {
       </div>
 
       </div>
+);
 
 
     </div>
   );
-}
+};
+
+export default RealTime;

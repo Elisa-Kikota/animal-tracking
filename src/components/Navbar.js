@@ -17,7 +17,7 @@ function Navbar({ toggleSidebar }) {
         </IconButton>
         <img src={Logo} alt="Logo" style={{ width: 40, height: 40, marginRight: 10 }} />
         <Typography variant="h6" style={{ flexGrow: 1 }}>
-          UDSM Animal Tracking
+          AI-Powered Animal Tracking System
         </Typography>
         <IconButton color="inherit">
           <NotificationsIcon />

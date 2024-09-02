@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.abac7df0.css",
-    "main.js": "/static/js/main.b409625c.js",
+    "main.css": "/static/css/main.4a0ebf99.css",
+    "main.js": "/static/js/main.5a631212.js",
     "static/js/453.78ea8ba2.chunk.js": "/static/js/453.78ea8ba2.chunk.js",
     "static/media/3d.png": "/static/media/3d.6ab09e09693d0321f9c4.png",
     "static/media/logo.png": "/static/media/logo.a88ec86e3934a021d877.png",
@@ -9,18 +9,22 @@
     "static/media/heatmap.png": "/static/media/heatmap.edce778712670149221e.png",
     "static/media/feature2.png": "/static/media/feature2.c81d109aad124a9d3e32.png",
     "static/media/background.jpg": "/static/media/background.38c69c2f8e1d29ce9399.jpg",
+    "static/media/giraffe.png": "/static/media/giraffe.f7786d81dd01d94a476e.png",
+    "static/media/lion.png": "/static/media/lion.8a5aa224f86c99b3dc25.png",
     "static/media/elephant.png": "/static/media/elephant.fd59b9edfb1223bf510d.png",
+    "static/media/rhino.png": "/static/media/rhino.38842e6f01eb0fb9b47f.png",
+    "static/media/leopard.png": "/static/media/leopard.0239ee6c0a80afea02b0.png",
     "static/media/animal.png": "/static/media/animal.1ee825f31a5a18e8cdd3.png",
     "static/media/layers.png": "/static/media/layers.d5d1e55788e132120da6.png",
     "static/media/patrols.png": "/static/media/patrols.a3963c841ed391c6c9f8.png",
     "static/media/location.png": "/static/media/location.e5a92986ecc76edeb21e.png",
     "index.html": "/index.html",
-    "main.abac7df0.css.map": "/static/css/main.abac7df0.css.map",
-    "main.b409625c.js.map": "/static/js/main.b409625c.js.map",
+    "main.4a0ebf99.css.map": "/static/css/main.4a0ebf99.css.map",
+    "main.5a631212.js.map": "/static/js/main.5a631212.js.map",
     "453.78ea8ba2.chunk.js.map": "/static/js/453.78ea8ba2.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.abac7df0.css",
-    "static/js/main.b409625c.js"
+    "static/css/main.4a0ebf99.css",
+    "static/js/main.5a631212.js"
   ]
 }

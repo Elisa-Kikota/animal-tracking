@@ -13,7 +13,7 @@ import './App.css';
 import './styles/Transitions.css';
 
 const pageOrder = [
-  '/',
+  '/welcome',
   '/real_time',
   '/view_users',
   '/view_animals',

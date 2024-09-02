@@ -1,27 +1,38 @@
 .realtime-container {
-  display: flex;
+  /* display: flex; */
   position: relative;
   height: 100vh; /* Use full viewport height */
-  overflow: hidden; /* Prevent scrolling */
+  overflow:hidden; /* Prevent scrolling */
+  }
+
+  #map {
+    flex: 1;
+    height: 100vh;
+    z-index:0;
 }
 
-#map {
+.map {
   flex: 1;
-  height: 100%;
+  width: 100vw-70px;
+  height:100vw-64px;
+  z-index:0;
+  margin-left: 70px;
 }
 
 .fixed-sidebar {
+  display: flex;
   position: absolute;
   top: 0;
   left: 0;
   bottom: 0;
   width: 70px;
+  height:100vh-64px;
   background-color: rgba(31, 118, 206, 0.6);
   padding: 10px 0;
-  display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  /* z-index:1; */
 }
 
 .sidebar-button {
@@ -244,6 +255,7 @@ padding-right: 10px;
   width: 40%;
   padding: 5px;
   margin: 4px;
+  /* border-radius: 8px; */
 }
 
 .filter-btn, .date-btn, .date-updated-btn {
@@ -391,4 +403,40 @@ padding-right: 10px;
   background: none;
   border: none;
   color: rgb(255, 255, 255);
+}
+
+.leaflet-container{
+  height:100vh;
+}
+
+.leaflet-bottom.leaflet-right{
+  height:0;
+}
+
+.leaflet-left{
+  /* left:0; */
+  right:10;
+}
+
+.leaflet-control-zoom.leaflet-bar.leaflet-control{
+  /* margin-left:0; */
+  right:10;
+}
+
+/* sizing of map container*/
+.leaflet-container{
+  height:100vh;
+}
+
+.cluster-icon{
+  height: 3rem;
+  width: 3rem;
+  border-radius: 50%;
+  background-color: white;
+  transform: translate(-25%,-25%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 900;
+  font-size: 1.5rem;
 }

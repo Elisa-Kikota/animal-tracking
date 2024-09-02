@@ -19,7 +19,7 @@ const Welcome = () => {
       <Container maxWidth='lg'>
         <Box my={4}>
           <Typography variant="h2" component="h1" gutterBottom style={{ color: 'white' }}>
-            Welcome to Animal Tracking
+            Welcome to AI-Powered Animal Tracking System
           </Typography>
           <Typography variant="h5" component="p" gutterBottom style={{ color: 'white' }}>
             Efficient and reliable tracking of wildlife and domestic animals.
