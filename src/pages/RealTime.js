@@ -24,7 +24,7 @@ import leopardIcon from '../assets/leopard.png';
 
 import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import {Icon, divIcon} from "leaflet";
+import {Icon} from "leaflet";
 import MarkerClusterGroup from 'react-leaflet-cluster';
 
 export default function RealTime() {
