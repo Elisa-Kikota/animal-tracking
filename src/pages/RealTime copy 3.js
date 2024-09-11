@@ -1,8 +1,7 @@
 import '../styles/RealTime.css';
 import "leaflet/dist/leaflet.css"
 
-import React, { useEffect, useState } from 'react';
-import { ref, update, onValue} from 'firebase/database';
+import { ref, onValue } from 'firebase/database';
 import { database } from '../firebase'; // Adjust the path if needed
 
 import FireIcon from '../assets/Fire.png'
@@ -43,6 +42,7 @@ import giraffeIcon from '../assets/giraffe.png';
 import rhinoIcon from '../assets/rhino.png';
 import leopardIcon from '../assets/leopard.png';
 
+import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Icon } from "leaflet";
 import MarkerClusterGroup from 'react-leaflet-cluster';
@@ -50,7 +50,6 @@ import MarkerClusterGroup from 'react-leaflet-cluster';
 export default function RealTime() {
   const [animalData, setAnimalData] = useState([]);
   const [reportData, setReportData] = useState([]);
-  const [typingTimeout, setTypingTimeout] = useState(null);
   const [map] = useState(null);
   const [isLayerMenuVisible, setIsLayerMenuVisible] = useState(false);
   const [isReportMenuVisible, setIsReportMenuVisible] = useState(false);
@@ -64,7 +63,8 @@ export default function RealTime() {
 
   useEffect(() => {
     const animalSpecies = ['Elephants', 'Giraffes', 'Lions', 'Leopards', 'Rhinos'];
-    
+    const fetchedData = [];
+  
     animalSpecies.forEach((species) => {
       const animalsRef = ref(database, `Animals/${species}`);
       onValue(animalsRef, (snapshot) => {
@@ -83,24 +83,12 @@ export default function RealTime() {
               Lat: parseFloat(location.Lat),
               Lng: parseFloat(location.Long),
             },
-            upload_interval: animal.upload_interval || '', // Default to an empty string if not present
             date: latestTimestamp,
             time: latestTime,
           };
         });
-        
-        setAnimalData(prevData => {
-          const updatedData = [...prevData];
-          animalArray.forEach(newAnimal => {
-            const index = updatedData.findIndex(animal => animal.id === newAnimal.id);
-            if (index !== -1) {
-              updatedData[index] = newAnimal;
-            } else {
-              updatedData.push(newAnimal);
-            }
-          });
-          return updatedData;
-        });
+        fetchedData.push(...animalArray);
+        setAnimalData(fetchedData);
       }, (error) => {
         console.error('Error fetching animal data:', error);
       });
@@ -130,7 +118,6 @@ export default function RealTime() {
             ...report,
             id: key,
             category,
-
             location: {
               Lat: parseFloat(report.location.Lat),
               Lng: parseFloat(report.location.Long),
@@ -230,59 +217,6 @@ export default function RealTime() {
       </div>
     );
   };
-
-  const handleIntervalChange = (e, animalId, species) => {
-    const newInterval = e.target.value;
-    
-    // Update local state immediately to reflect in the input field
-    setAnimalData(prevData =>
-      prevData.map(animal =>
-        animal.id === animalId
-          ? { ...animal, upload_interval: newInterval }
-          : animal
-      )
-    );
-
-    // Clear the previous timeout to prevent multiple updates
-    if (typingTimeout) {
-      clearTimeout(typingTimeout);
-    }
-
-    // Set a new timeout to update Firebase after a short delay
-    const timeoutId = setTimeout(() => {
-      const pluralSpecies = species === 'Elephant' ? 'Elephants' :
-                            species === 'Lion' ? 'Lions' :
-                            species === 'Giraffe' ? 'Giraffes' :
-                            species === 'Rhino' ? 'Rhinos' :
-                            species === 'Leopard' ? 'Leopards' : species;
-
-      // Update Firebase after the delay
-      const animalRef = ref(database, `Animals/${pluralSpecies}/${animalId}`);
-      update(animalRef, {
-        upload_interval: newInterval
-      })
-      .then(() => {
-        console.log("Upload interval updated successfully in Firebase");
-      })
-      .catch((error) => {
-        console.error("Error updating upload interval in Firebase:", error);
-        // Revert local state if Firebase update fails
-        setAnimalData(prevData =>
-          prevData.map(animal =>
-            animal.id === animalId
-              ? { ...animal, upload_interval: animal.upload_interval }
-              : animal
-          )
-        );
-      });
-    }, 1000); // Update Firebase after 1 second delay
-
-    setTypingTimeout(timeoutId); // Store the timeout ID
-  };
-  
-
-  
-  
   
 
   return (
@@ -526,62 +460,43 @@ export default function RealTime() {
       </div>
 
       <div id="remote-control-menu" className={`remote-control-menu ${isRemoteControlMenuVisible ? 'show' : 'hide'}`}>
-  <div className="remote-control-header">
-    <span className="plus-sign">+</span>
-    <span className="remote-control-title">Remote Control Tag</span>
-    <span className="close-sign" onClick={toggleReportMenu}>x</span>
-  </div>
-  <div className="remote-control-filters">
-    <input type="text" placeholder="Search..." className="search-bar" />
-    <button className="filter-btn">Filters</button>
-    <button className="date-btn">Dates</button>
-    <button className="date-updated-btn">Date Updated</button>
-  </div>
-  <div className="remote-control-summary">
-    <span>{reportData.length} results from about <b>{/* time logic here */} ago until now</b></span>
-  </div>
-  <div className="remote-control-list">
+      <div className="remote-control-header">
+      <span className="plus-sign">+</span>
+      <span className="remote-control-title">Remote Control Tag</span>
+      <span className="close-sign" onClick={toggleReportMenu}>x</span>
+    </div>
+    <div className="remote-control-filters">
+      <input type="text" placeholder="Search..." className="search-bar" />
+      <button className="filter-btn">Filters</button>
+      <button className="date-btn">Dates</button>
+      <button className="date-updated-btn">Date Updated</button>
+    </div>
+    <div className="remote-control-summary">
+      <span>{reportData.length} results from about <b> {/* time logic here */} ago until now</b></span>
+    </div>
+    <div className="remote-control-list">
     {animalData.map((animal) => (
-      <div key={animal.id} className="animal-item">
-        <img src={
-          animal.species.toLowerCase() === 'elephant' ? elephantIcon :
-          animal.species.toLowerCase() === 'lion' ? lionIcon :
-          animal.species.toLowerCase() === 'rhino' ? rhinoIcon :
-          animal.species.toLowerCase() === 'leopard' ? leopardIcon :
-          giraffeIcon // Default for giraffe and others
-        } alt="animal" className="animal-image" />
-        
-        <span className="entry-number">{animal.id}</span>
-        <span className="animal-name">{animal.name}</span>
-        
-        {/* Added text box for upload interval */}
-        <span className="animal-upload-interval">
-        <input
-          key={animal.id}
-          type="text"
-          value={animal.upload_interval || ''}
-          placeholder="Enter Interval"
-          className='interval-input'
-          onChange={(e) => handleIntervalChange(e, animal.id, animal.species)}
-        />
-
-</span>
-
-        
-        <span className="animal-day-time">
-          <div className="animal-date">{animal.date}</div>
-          <div className="animal-time">{animal.time}</div>
-        </span>
-        
-        <button className="locate-icon">
-          <img src={locationIcon} alt="locationIcon" className="layer-icon" />
-        </button>
-      </div>
-    ))}
-  </div>
+            <div key={animal.id} className="animal-item">
+              <img src={
+                animal.species.toLowerCase() === 'elephant' ? elephantIcon :
+                animal.species.toLowerCase() === 'lion' ? lionIcon :
+                animal.species.toLowerCase() === 'rhino' ? rhinoIcon :
+                animal.species.toLowerCase() === 'leopard' ? leopardIcon :
+                giraffeIcon // Default for giraffe and others
+              } alt="animal" className="animal-image" />
+              <span className="entry-number">{animal.id}</span>
+              <span className="animal-name">{animal.name}</span>
+              <span className="animal-day-time">
+                <div className="animal-date">{animal.date}</div>
+                <div className="animal-time">{animal.time}</div>
+              </span>
+              <button className="locate-icon">
+                <img src={locationIcon} alt="locationIcon" className="layer-icon" />
+              </button>
+            </div>
+        ))}
+    </div>
 </div>
-
-
 
 {isModalOpen && (
   <ReportModal report={selectedReport} onClose={closeModal} />
