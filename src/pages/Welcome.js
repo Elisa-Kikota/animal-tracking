@@ -1,23 +1,74 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Typography, Box, Button, Grid, Paper } from '@mui/material';
 import { Link } from 'react-router-dom';
-import backgroundImage from '../assets/background.jpg'; // Ensure this file exists
-import featureIcon1 from '../assets/feature1.png'; // Ensure this file exists
-import featureIcon2 from '../assets/feature2.png'; // Ensure this file exists
+import { ref, onValue } from 'firebase/database';
+import { database } from '../firebase'; // Adjust the import path as needed
+import backgroundImage from '../assets/background.jpg';
+
 
 const Welcome = () => {
+  const [stats, setStats] = useState({
+    animalsTracked: 0,
+    speciesCovered: 0,
+    patrolOfficers: 0
+  });
+
+  useEffect(() => {
+    const animalsRef = ref(database, 'Animals');
+    const patrolOfficersRef = ref(database, 'PatrolOfficers');
+
+    const fetchData = async () => {
+      try {
+        const animalsSnapshot = await new Promise((resolve, reject) => {
+          onValue(animalsRef, resolve, reject);
+        });
+
+        const patrolOfficersSnapshot = await new Promise((resolve, reject) => {
+          onValue(patrolOfficersRef, resolve, reject);
+        });
+
+        const animalsData = animalsSnapshot.val();
+        const patrolOfficersData = patrolOfficersSnapshot.val();
+
+        let totalAnimals = 0;
+        const species = new Set();
+
+        if (animalsData) {
+          Object.keys(animalsData).forEach(speciesKey => {
+            species.add(speciesKey);
+            const speciesData = animalsData[speciesKey];
+            totalAnimals += Object.keys(speciesData).length;
+          });
+        }
+
+        const patrolOfficersCount = patrolOfficersData ? Object.keys(patrolOfficersData).length : 0;
+
+        setStats({
+          animalsTracked: totalAnimals,
+          speciesCovered: species.size,
+          patrolOfficers: patrolOfficersCount
+        });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div style={{ 
       backgroundImage: `url(${backgroundImage})`, 
       backgroundSize: 'cover', 
       backgroundPosition: 'center', 
-      height: '100vh', 
+      height: '100%', 
       color: 'white', 
       textAlign: 'center', 
-      padding: '20px'
+      padding: '20px',
+      overflowY: 'auto'
     }}>
-      <Container maxWidth='lg'>
-        <Box my={4}>
+      <Container maxWidth='lg' style={{ height: '100%' }}>
+        <Box my={1}>
           <Typography variant="h2" component="h1" gutterBottom style={{ color: 'white' }}>
             Welcome to AI-Powered Animal Tracking System
           </Typography>
@@ -34,43 +85,13 @@ const Welcome = () => {
 
         <Box my={4}>
           <Typography variant="h4" component="h2" gutterBottom style={{ color: 'white' }}>
-            Features
-          </Typography>
-          <Grid container spacing={4}>
-            <Grid item xs={12} md={6}>
-              <Paper elevation={3} style={{ padding: '20px', backgroundColor: 'rgba(0,0,0,0.7)' }}>
-                <img src={featureIcon1} alt="Feature 1" style={{ width: '50px' }} />
-                <Typography variant="h6" component="h3" style={{ color: 'white' }}>
-                  Real-time Tracking
-                </Typography>
-                <Typography component="p" style={{ color: 'white' }}>
-                  Monitor animals in real-time with live updates and alerts.
-                </Typography>
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Paper elevation={3} style={{ padding: '20px', backgroundColor: 'rgba(0,0,0,0.7)' }}>
-                <img src={featureIcon2} alt="Feature 2" style={{ width: '50px' }} />
-                <Typography variant="h6" component="h3" style={{ color: 'white' }}>
-                  Data Analysis
-                </Typography>
-                <Typography component="p" style={{ color: 'white' }}>
-                  Analyze tracking data to gain insights into animal behavior and migration patterns.
-                </Typography>
-              </Paper>
-            </Grid>
-          </Grid>
-        </Box>
-
-        <Box my={4}>
-          <Typography variant="h4" component="h2" gutterBottom style={{ color: 'white' }}>
             Statistics
           </Typography>
           <Grid container spacing={4}>
             <Grid item xs={12} md={4}>
               <Paper elevation={3} style={{ padding: '20px', backgroundColor: 'rgba(0,0,0,0.7)' }}>
                 <Typography variant="h2" component="p" style={{ color: 'white' }}>
-                  1,234
+                  {stats.animalsTracked.toLocaleString()}
                 </Typography>
                 <Typography component="p" style={{ color: 'white' }}>
                   Animals Tracked
@@ -80,7 +101,7 @@ const Welcome = () => {
             <Grid item xs={12} md={4}>
               <Paper elevation={3} style={{ padding: '20px', backgroundColor: 'rgba(0,0,0,0.7)' }}>
                 <Typography variant="h2" component="p" style={{ color: 'white' }}>
-                  567
+                  {stats.speciesCovered.toLocaleString()}
                 </Typography>
                 <Typography component="p" style={{ color: 'white' }}>
                   Species Covered
@@ -90,15 +111,16 @@ const Welcome = () => {
             <Grid item xs={12} md={4}>
               <Paper elevation={3} style={{ padding: '20px', backgroundColor: 'rgba(0,0,0,0.7)' }}>
                 <Typography variant="h2" component="p" style={{ color: 'white' }}>
-                  89
+                  {stats.patrolOfficers.toLocaleString()}
                 </Typography>
                 <Typography component="p" style={{ color: 'white' }}>
-                  Countries Reached
+                  Patrol Officers
                 </Typography>
               </Paper>
             </Grid>
           </Grid>
         </Box>
+
 
         <Box my={4}>
           <Typography variant="h4" component="h2" gutterBottom style={{ color: 'white' }}>

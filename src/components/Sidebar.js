@@ -1,32 +1,30 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Home, Clock, Users, PawPrint, BarChart2, Lock, LogOut } from 'lucide-react';
 import './Sidebar.css';
 
 const Sidebar = ({ isSidebarOpen, setCurrentPage }) => {
+  const menuItems = [
+    { path: '/', text: 'Welcome', icon: Home },
+    { path: '/real_time', text: 'Real Time', icon: Clock },
+    { path: '/view_users', text: 'View Users', icon: Users },
+    { path: '/view_animals', text: 'View Animals', icon: PawPrint },
+    { path: '/analysis', text: 'Analysis', icon: BarChart2 },
+    { path: '/change_password', text: 'Change Password', icon: Lock },
+    { path: '/signout', text: 'Signout', icon: LogOut },
+  ];
+
   return (
     <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
       <ul>
-        <li>
-          <Link to="/" onClick={() => setCurrentPage('/')}>Welcome</Link>
-        </li>
-        <li>
-          <Link to="/real_time" onClick={() => setCurrentPage('/real_time')}>Real Time</Link>
-        </li>
-        <li>
-          <Link to="/view_users" onClick={() => setCurrentPage('/view_users')}>View Users</Link>
-        </li>
-        <li>
-          <Link to="/view_animals" onClick={() => setCurrentPage('/view_animals')}>View Animals</Link>
-        </li>
-        <li>
-          <Link to="/analysis" onClick={() => setCurrentPage('/analysis')}>Analysis</Link>
-        </li>
-        <li>
-          <Link to="/change_password" onClick={() => setCurrentPage('/change_password')}>Change Password</Link>
-        </li>
-        <li>
-          <Link to="/signout" onClick={() => setCurrentPage('/signout')}>Signout</Link>
-        </li>
+        {menuItems.map((item) => (
+          <li key={item.path}>
+            <Link to={item.path} onClick={() => setCurrentPage(item.path)}>
+              <item.icon size={24} />
+              <span>{item.text}</span>
+            </Link>
+          </li>
+        ))}
       </ul>
     </div>
   );

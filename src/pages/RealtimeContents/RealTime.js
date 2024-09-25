@@ -114,62 +114,33 @@ export default function RealTime() {
       'Rhino_Sighting',
       'Wildlife_Sighting'
     ];
+    const fetchedReports = [];
 
-    const reportsRef = ref(database, 'Reports');
-
-    const unsubscribe = onValue(reportsRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const fetchedReports = reportCategories.flatMap(category => {
-          const categoryReports = data[category] || {};
-          return Object.entries(categoryReports).map(([key, report]) => ({
+    reportCategories.forEach((category) => {
+      const reportsRef = ref(database, `Reports/${category}`);
+      onValue(reportsRef, (snapshot) => {
+        const data = snapshot.val();
+        const reportArray = Object.keys(data).map((key) => {
+          const report = data[key];
+          return {
             ...report,
             id: key,
             category,
+
             location: {
               Lat: parseFloat(report.location.Lat),
               Lng: parseFloat(report.location.Long),
             },
             timestamp: report.timestamp
-          }));
+          };
         });
+        fetchedReports.push(...reportArray);
         setReportData(fetchedReports);
-      }
-    }, (error) => {
-      console.error('Error fetching report data:', error);
+      }, (error) => {
+        console.error('Error fetching report data:', error);
+      });
     });
-
-    return () => unsubscribe();
   }, []);
-
-  // const fetchedReports = [];
-
-
-  // reportCategories.forEach((category) => {
-  //   const reportsRef = ref(database, `Reports/${category}`);
-  //   onValue(reportsRef, (snapshot) => {
-  //     const data = snapshot.val();
-  //     const reportArray = Object.keys(data).map((key) => {
-  //       const report = data[key];
-  //       return {
-  //         ...report,
-  //         id: key,
-  //         category,
-
-  //         location: {
-  //           Lat: parseFloat(report.location.Lat),
-  //           Lng: parseFloat(report.location.Long),
-  //         },
-  //         timestamp: report.timestamp
-  //       };
-  //     });
-  //     fetchedReports.push(...reportArray);
-  //     setReportData(fetchedReports);
-  //   }, (error) => {
-  //     console.error('Error fetching report data:', error);
-  //   });
-  // });
-
 
   const handleLayerChange = (style) => {
     if (map) {
@@ -237,7 +208,7 @@ export default function RealTime() {
           <h2>{report.category.replace(/_/g, ' ')}</h2>
           <p><strong>Reported by:</strong> {report.reported_by}</p>
           <p><strong>Report Time:</strong> {report.time}</p>
-          <p><strong>Location:</strong> Lat: {report.location.Lat}, Long: {report.location.Lng}</p>
+          <p><strong>Location:</strong> Lat: {report.location.Lat}, Long: {report.location.Long}</p>
           {report.species && <p><strong>Species:</strong> {report.species}</p>}
           {report.cause_of_injury && <p><strong>Cause of Injury:</strong> {report.cause_of_injury}</p>}
           {report.cause_of_fire && <p><strong>Fire Cause:</strong> {report.cause_of_fire}</p>}
@@ -565,6 +536,8 @@ export default function RealTime() {
           ))}
         </div>
       </div>
+
+
 
       {isModalOpen && (
         <ReportModal report={selectedReport} onClose={closeModal} />

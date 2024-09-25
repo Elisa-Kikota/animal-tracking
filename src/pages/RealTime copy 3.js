@@ -64,7 +64,7 @@ export default function RealTime() {
   useEffect(() => {
     const animalSpecies = ['Elephants', 'Giraffes', 'Lions', 'Leopards', 'Rhinos'];
     const fetchedData = [];
-  
+
     animalSpecies.forEach((species) => {
       const animalsRef = ref(database, `Animals/${species}`);
       onValue(animalsRef, (snapshot) => {
@@ -74,7 +74,7 @@ export default function RealTime() {
           const latestTimestamp = Object.keys(animal.location).sort().pop();
           const latestTime = Object.keys(animal.location[latestTimestamp]).sort().pop();
           const location = animal.location[latestTimestamp][latestTime];
-  
+
           return {
             ...animal,
             id: key,
@@ -164,7 +164,7 @@ export default function RealTime() {
   };
 
   const toggleAnimalMenu = () => {
-    setIsReportMenuVisible(false); 
+    setIsReportMenuVisible(false);
     setIsPatrolMenuVisible(false);
     setIsLayerMenuVisible(false);
     setIsAnimalMenuVisible(!isAnimalMenuVisible);
@@ -183,7 +183,7 @@ export default function RealTime() {
     setSelectedReport(report);
     setIsModalOpen(true);
   };
-  
+
   const closeModal = () => {
     setSelectedReport(null);
     setIsModalOpen(false);
@@ -191,7 +191,7 @@ export default function RealTime() {
 
   const ReportModal = ({ report, onClose }) => {
     if (!report) return null;
-  
+
     return (
       <div className="modal">
         <div className="modal-content">
@@ -217,32 +217,32 @@ export default function RealTime() {
       </div>
     );
   };
-  
+
 
   return (
     <div className="realtime-container">
       <div className="fixed-sidebar">
-  <button className="sidebar-button" onClick={toggleReportMenu}>
-    <img src={reportsIcon} alt="Reports" className="sidebar-icon" />
-    <span>Reports</span>
-  </button>
-  <button className="sidebar-button" onClick={togglePatrolMenu}>
-    <img src={patrolsIcon} alt="Patrols" className="sidebar-icon" />
-    <span>Patrols</span>
-  </button>
-  <button className="sidebar-button" onClick={toggleLayerMenu}>
-    <img src={layersIcon} alt="Layers" className="sidebar-icon" />
-    <span>Layers</span>
-  </button>
-  <button className="sidebar-button" onClick={toggleAnimalMenu}>
-    <img src={animalIcon} alt="Animals" className="sidebar-icon" />
-    <span>Animals</span>
-  </button>
-  <button className="sidebar-button" onClick={toggleRemoteControlMenu}>
-    <img src={remoteControlIcon} alt="Remote Control" className="sidebar-icon" />
-    <span>Remote<br></br>Control</span>
-  </button> 
-</div>
+        <button className="sidebar-button" onClick={toggleReportMenu}>
+          <img src={reportsIcon} alt="Reports" className="sidebar-icon" />
+          <span>Reports</span>
+        </button>
+        <button className="sidebar-button" onClick={togglePatrolMenu}>
+          <img src={patrolsIcon} alt="Patrols" className="sidebar-icon" />
+          <span>Patrols</span>
+        </button>
+        <button className="sidebar-button" onClick={toggleLayerMenu}>
+          <img src={layersIcon} alt="Layers" className="sidebar-icon" />
+          <span>Layers</span>
+        </button>
+        <button className="sidebar-button" onClick={toggleAnimalMenu}>
+          <img src={animalIcon} alt="Animals" className="sidebar-icon" />
+          <span>Animals</span>
+        </button>
+        <button className="sidebar-button" onClick={toggleRemoteControlMenu}>
+          <img src={remoteControlIcon} alt="Remote Control" className="sidebar-icon" />
+          <span>Remote<br></br>Control</span>
+        </button>
+      </div>
 
 
       <MapContainer className="map" center={[-1.948, 34.1665]} zoom={16}>
@@ -252,13 +252,13 @@ export default function RealTime() {
             const reportIcon = new Icon({
               iconUrl:
                 report.category === 'CT_Icon_Sighting' ? CTIcon :
-                report.category === 'Fire' ? fireIcon :
-                report.category === 'Human_Wildlife_Contact' ? humanWildlifeIcon :
-                report.category === 'Injured_Animal' ? injuredAnimalIcon :
-                report.category === 'Invasive_Species_Sighting' ? invasiveSpeciesIcon :
-                report.category === 'Rainfall' ? rainfallIcon :
-                report.category === 'Rhino_Sighting' ? rhinoSightingIcon :
-                wildlifeSightingIcon, // Default icon
+                  report.category === 'Fire' ? fireIcon :
+                    report.category === 'Human_Wildlife_Contact' ? humanWildlifeIcon :
+                      report.category === 'Injured_Animal' ? injuredAnimalIcon :
+                        report.category === 'Invasive_Species_Sighting' ? invasiveSpeciesIcon :
+                          report.category === 'Rainfall' ? rainfallIcon :
+                            report.category === 'Rhino_Sighting' ? rhinoSightingIcon :
+                              wildlifeSightingIcon, // Default icon
               iconSize: [38, 38]
             });
 
@@ -279,38 +279,38 @@ export default function RealTime() {
             );
           })}
 
-{animalData.map(animal => {
-      // Determine the icon based on species
-      const speciesIcon = new Icon({
-        iconUrl: 
-          animal.species.toLowerCase() === 'elephant' ? elephantIcon :
-          animal.species.toLowerCase() === 'lion' ? lionIcon :
-          animal.species.toLowerCase() === 'giraffe' ? giraffeIcon :
-          animal.species.toLowerCase() === 'rhino' ? rhinoIcon :
-          animal.species.toLowerCase() === 'leopard' ? leopardIcon :
-          animalIcon, // Default icon for other species
-        iconSize: [38, 38] // Adjust size as needed
-      });
+          {animalData.map(animal => {
+            // Determine the icon based on species
+            const speciesIcon = new Icon({
+              iconUrl:
+                animal.species.toLowerCase() === 'elephant' ? elephantIcon :
+                  animal.species.toLowerCase() === 'lion' ? lionIcon :
+                    animal.species.toLowerCase() === 'giraffe' ? giraffeIcon :
+                      animal.species.toLowerCase() === 'rhino' ? rhinoIcon :
+                        animal.species.toLowerCase() === 'leopard' ? leopardIcon :
+                          animalIcon, // Default icon for other species
+              iconSize: [38, 38] // Adjust size as needed
+            });
 
-      return (
-        <Marker 
-          key={animal.id} // Ensure each marker has a unique key
-          position={[animal.location.Lat, animal.location.Lng]} 
-          icon={speciesIcon} // Use species-specific icon
-        >
-          <Popup>
-            <div style={{ padding: '0px', borderRadius: '1px' }}>
-              <strong>{animal.name}</strong><br />
-              Sex: {animal.sex}<br />
-              Age: {animal.age} years<br />
-              Temp: {animal.temp} °C<br /> 
-              Activity: {animal.activity}
-            </div>
-          </Popup>
+            return (
+              <Marker
+                key={animal.id} // Ensure each marker has a unique key
+                position={[animal.location.Lat, animal.location.Lng]}
+                icon={speciesIcon} // Use species-specific icon
+              >
+                <Popup>
+                  <div style={{ padding: '0px', borderRadius: '1px' }}>
+                    <strong>{animal.name}</strong><br />
+                    Sex: {animal.sex}<br />
+                    Age: {animal.age} years<br />
+                    Temp: {animal.temp} °C<br />
+                    Activity: {animal.activity}
+                  </div>
+                </Popup>
 
-        </Marker>
-      );
-    })}
+              </Marker>
+            );
+          })}
         </MarkerClusterGroup>
       </MapContainer>
 
@@ -342,53 +342,53 @@ export default function RealTime() {
       </div>
 
       <div id="report-menu" className={`report-menu ${isReportMenuVisible ? 'show' : 'hide'}`}>
-    <div className="report-header">
-      <span className="plus-sign">+</span>
-      <span className="report-title">Reports</span>
-      <span className="close-sign" onClick={toggleReportMenu}>x</span>
-    </div>
-    <div className="report-filters">
-      <input type="text" placeholder="Search..." className="search-bar" />
-      <button className="filter-btn">Filters</button>
-      <button className="date-btn">Dates</button>
-      <button className="date-updated-btn">Date Updated</button>
-    </div>
-    <div className="report-summary">
-      <span>{reportData.length} results from about <b> {/* time logic here */} ago until now</b></span>
-    </div>
-    <div className="report-list">
-  {reportData.map((report) => (
-    <div 
-      key={report.id} 
-      className="report-item" 
-      onClick={() => openModal(report)} // Open modal on click
-    >
-      <img src={
-        report.category === 'CT_Icon_Sighting' ? CTIcon :
-        report.category === 'Fire' ? FireIcon :
-        report.category === 'Human_Wildlife_Contact' ? HumanWildlifeContactIcon :
-        report.category === 'Injured_Animal' ? InjuredAnimalIcon :
-        report.category === 'Invasive_Species_Sighting' ? InvasiveSpeciesIcon :
-        report.category === 'Rainfall' ? RainfallIcon :
-        report.category === 'Rhino_Sighting' ? RhinoSightingIcon :
-        WildlifeSightingIcon  // Default icon for other categories
-      } alt="report" className="report-image" />
-      <span className="entry-number">{report.id}</span>
-      <span className="report-name">{report.category.replace(/_/g, ' ')}</span>
-      <span className="report-day-time">
-        <div className="report-date"> {/* Date logic here */} </div>
-        <div className="report-time"> {/* Time logic here */} </div>
-      </span>
-      <button className="locate-icon">
-        <img src={locationIcon} alt="locationIcon" className="layer-icon" />
-      </button>
-    </div>
-  ))}
-</div>
+        <div className="report-header">
+          <span className="plus-sign">+</span>
+          <span className="report-title">Reports</span>
+          <span className="close-sign" onClick={toggleReportMenu}>x</span>
+        </div>
+        <div className="report-filters">
+          <input type="text" placeholder="Search..." className="search-bar" />
+          <button className="filter-btn">Filters</button>
+          <button className="date-btn">Dates</button>
+          <button className="date-updated-btn">Date Updated</button>
+        </div>
+        <div className="report-summary">
+          <span>{reportData.length} results from about <b> {/* time logic here */} ago until now</b></span>
+        </div>
+        <div className="report-list">
+          {reportData.map((report) => (
+            <div
+              key={report.id}
+              className="report-item"
+              onClick={() => openModal(report)} // Open modal on click
+            >
+              <img src={
+                report.category === 'CT_Icon_Sighting' ? CTIcon :
+                  report.category === 'Fire' ? FireIcon :
+                    report.category === 'Human_Wildlife_Contact' ? HumanWildlifeContactIcon :
+                      report.category === 'Injured_Animal' ? InjuredAnimalIcon :
+                        report.category === 'Invasive_Species_Sighting' ? InvasiveSpeciesIcon :
+                          report.category === 'Rainfall' ? RainfallIcon :
+                            report.category === 'Rhino_Sighting' ? RhinoSightingIcon :
+                              WildlifeSightingIcon  // Default icon for other categories
+              } alt="report" className="report-image" />
+              <span className="entry-number">{report.id}</span>
+              <span className="report-name">{report.category.replace(/_/g, ' ')}</span>
+              <span className="report-day-time">
+                <div className="report-date"> {/* Date logic here */} </div>
+                <div className="report-time"> {/* Time logic here */} </div>
+              </span>
+              <button className="locate-icon">
+                <img src={locationIcon} alt="locationIcon" className="layer-icon" />
+              </button>
+            </div>
+          ))}
+        </div>
 
-  </div>
+      </div>
 
-  <div id="patrol-menu" className={`patrol-menu ${isPatrolMenuVisible ? 'show' : 'hide'}`}>
+      <div id="patrol-menu" className={`patrol-menu ${isPatrolMenuVisible ? 'show' : 'hide'}`}>
         <div className="patrol-header">
           <span className="plus-sign">+</span>
           <span className="report-title">Patrol Officers</span>
@@ -413,7 +413,7 @@ export default function RealTime() {
               <div classname="patrol-date">9th Aug 2024</div>
               <div classname="patrol-time">12:30 PM</div>
             </span>
-            <button className="locate-icon">{ <img src={locationIcon} alt="locationIcon" className="layer-icon" />}</button>
+            <button className="locate-icon">{<img src={locationIcon} alt="locationIcon" className="layer-icon" />}</button>
           </div>
           {/* Repeat for other reports */}
         </div>
@@ -439,10 +439,10 @@ export default function RealTime() {
             <div key={animal.id} className="animal-item">
               <img src={
                 animal.species.toLowerCase() === 'elephant' ? elephantIcon :
-                animal.species.toLowerCase() === 'lion' ? lionIcon :
-                animal.species.toLowerCase() === 'rhino' ? rhinoIcon :
-                animal.species.toLowerCase() === 'leopard' ? leopardIcon :
-                giraffeIcon // Default for giraffe and others
+                  animal.species.toLowerCase() === 'lion' ? lionIcon :
+                    animal.species.toLowerCase() === 'rhino' ? rhinoIcon :
+                      animal.species.toLowerCase() === 'leopard' ? leopardIcon :
+                        giraffeIcon // Default for giraffe and others
               } alt="animal" className="animal-image" />
               <span className="entry-number">{animal.id}</span>
               <span className="animal-name">{animal.name}</span>
@@ -454,35 +454,35 @@ export default function RealTime() {
                 <img src={locationIcon} alt="locationIcon" className="layer-icon" />
               </button>
             </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
       </div>
 
       <div id="remote-control-menu" className={`remote-control-menu ${isRemoteControlMenuVisible ? 'show' : 'hide'}`}>
-      <div className="remote-control-header">
-      <span className="plus-sign">+</span>
-      <span className="remote-control-title">Remote Control Tag</span>
-      <span className="close-sign" onClick={toggleReportMenu}>x</span>
-    </div>
-    <div className="remote-control-filters">
-      <input type="text" placeholder="Search..." className="search-bar" />
-      <button className="filter-btn">Filters</button>
-      <button className="date-btn">Dates</button>
-      <button className="date-updated-btn">Date Updated</button>
-    </div>
-    <div className="remote-control-summary">
-      <span>{reportData.length} results from about <b> {/* time logic here */} ago until now</b></span>
-    </div>
-    <div className="remote-control-list">
-    {animalData.map((animal) => (
+        <div className="remote-control-header">
+          <span className="plus-sign">+</span>
+          <span className="remote-control-title">Remote Control Tag</span>
+          <span className="close-sign" onClick={toggleReportMenu}>x</span>
+        </div>
+        <div className="remote-control-filters">
+          <input type="text" placeholder="Search..." className="search-bar" />
+          <button className="filter-btn">Filters</button>
+          <button className="date-btn">Dates</button>
+          <button className="date-updated-btn">Date Updated</button>
+        </div>
+        <div className="remote-control-summary">
+          <span>{reportData.length} results from about <b> {/* time logic here */} ago until now</b></span>
+        </div>
+        <div className="remote-control-list">
+          {animalData.map((animal) => (
             <div key={animal.id} className="animal-item">
               <img src={
                 animal.species.toLowerCase() === 'elephant' ? elephantIcon :
-                animal.species.toLowerCase() === 'lion' ? lionIcon :
-                animal.species.toLowerCase() === 'rhino' ? rhinoIcon :
-                animal.species.toLowerCase() === 'leopard' ? leopardIcon :
-                giraffeIcon // Default for giraffe and others
+                  animal.species.toLowerCase() === 'lion' ? lionIcon :
+                    animal.species.toLowerCase() === 'rhino' ? rhinoIcon :
+                      animal.species.toLowerCase() === 'leopard' ? leopardIcon :
+                        giraffeIcon // Default for giraffe and others
               } alt="animal" className="animal-image" />
               <span className="entry-number">{animal.id}</span>
               <span className="animal-name">{animal.name}</span>
@@ -494,13 +494,13 @@ export default function RealTime() {
                 <img src={locationIcon} alt="locationIcon" className="layer-icon" />
               </button>
             </div>
-        ))}
-    </div>
-</div>
+          ))}
+        </div>
+      </div>
 
-{isModalOpen && (
-  <ReportModal report={selectedReport} onClose={closeModal} />
-)}
+      {isModalOpen && (
+        <ReportModal report={selectedReport} onClose={closeModal} />
+      )}
 
 
     </div>
