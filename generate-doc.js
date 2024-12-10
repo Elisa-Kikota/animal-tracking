@@ -4,7 +4,7 @@ const path = require("path");
 // Directories and files to include
 const includePaths = ["src", "public", "package.json", ".env"];
 const excludeDirs = ["node_modules", ".git", "build"];
-const excludeExtensions = [".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico"];
+const excludeExtensions = [".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico", ".mp4"];
 const outputFile = "ProjectDocumentation.md";
 
 // Function to read files recursively
