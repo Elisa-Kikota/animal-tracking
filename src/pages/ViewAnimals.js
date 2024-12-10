@@ -81,8 +81,8 @@ function ViewAnimals() {
     if (selectedAnimal) {
       update(ref(database, `Animals/${animalData.species}/${selectedAnimal.id}`), animalData);
     } else {
-      const newAnimalRef = ref(database, `Animals/${animalData.species}`);
-      const newAnimal = set(newAnimalRef, animalData);
+      // const newAnimalRef = ref(database, `Animals/${animalData.species}`);
+      // const newAnimal = set(newAnimalRef, animalData);
     }
     handleCloseDialog();
   };
